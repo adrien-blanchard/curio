@@ -1,0 +1,12 @@
+.env*
+.git
+artifacts
+migration-private
+extension_ref
+supabase/.temp
+playwright-report
+test-results
+coverage
+docs/media
+extension/dist
+*.zip

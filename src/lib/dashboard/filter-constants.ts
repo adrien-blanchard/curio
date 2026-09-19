@@ -1,0 +1,1 @@
+export const MAX_DASHBOARD_TAG_FILTERS = 5;

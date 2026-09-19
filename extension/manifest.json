@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Curio",
+  "version": "1.2.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqW3ZNz2LhD8kR5A3aecwl6k5nI/gXyUElFNy4ZPjJ1NPZEFREzoY/tGdFmhPYja/fCruN/ZaahLPIFodP1IJBzSQWoD0QC5oNw3EMsIBSF8g02mklY+rVsctS+Y2+CgFiwniFEEyKChfMJt18YIKTUzsZYtba6YMERkTfIkRrHUBwLzFmxJVnEWHfUTxWauNupBk0vaf9DHDVwDNW4KrTHzuEWPmneXQZlXnVMZxX7ScfSI+4QK5qHq7OjGKKlTLl1fmq4WGNzMRRaVK2FI1+I/Rwalc5ocy9w3mCQAV2SnqAskvWKngrVOuSRcqtZrlNWCovC2DOJfQS9bU5lCyAwIDAQAB",
+  "description": "Save and organize useful links in your Curio instance.",
+  "minimum_chrome_version": "120",
+  "permissions": ["activeTab", "storage"],
+  "optional_host_permissions": ["https://*/*", "http://localhost/*", "http://127.0.0.1/*"],
+  "action": {
+    "default_title": "Save to Curio",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
+  }
+}

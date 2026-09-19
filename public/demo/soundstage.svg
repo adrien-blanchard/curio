@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 309" role="img" aria-label="Abstract pink audio waveform">
+  <defs><linearGradient id="a" x1="0" x2="1"><stop stop-color="#ffe6f3"/><stop offset="1" stop-color="#efe8ff"/></linearGradient></defs><rect width="720" height="309" fill="url(#a)"/><path d="M80 155h55l22-72 35 144 36-105 36 69 40-158 43 228 42-139 40 71 35-99 30 61h136" fill="none" stroke="#ec4899" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
