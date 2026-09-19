@@ -10,6 +10,10 @@ an item only when it has been exercised against the environment named by the ite
       preserves other recent uploads. Both changes have regression tests. The final local suite has
       520 passing tests (two opt-in live-provider tests skipped), plus three backend-free browser
       checks. Session/token authentication has dedicated boundary tests.
+- [x] Publication privacy review: no configured credentials or private project/company references
+      found across the Git history. Published screenshots and sampled video frames use fictional
+      data. Only `.env.example` is tracked; local credentials and import/reference folders are
+      excluded. Both GitHub dependency audit and full-history secret scanning pass.
 - [x] Source-age update: 502 application tests and 352 database assertions pass locally. The
       additive date migration is applied to development; all 50 existing entries remain intact with
       unknown source dates. Dashboard/detail/editor have no page overflow at 320, 375, 768, 1280 and
@@ -170,8 +174,8 @@ either value would make an old solution added today look new.
       link submission work. The full multi-source, role, and extension matrix remains pending.
 - [x] Select the owner's final five JPG screenshots and two MP4 exports, including the credited
       Cipher soundtrack in the full tour. Raw masters and prior iterations stay outside Git.
-- [ ] Configure the repository-local Git identity with the personal GitHub no-reply address.
-- [ ] Run a full secret scan, create the single root commit `Initial public release`, and push to a
+- [x] Configure the repository-local Git identity with the personal GitHub no-reply address.
+- [x] Run a full secret scan, create the single root commit `Initial public release`, and push to a
       new private GitHub repository.
 - [ ] Create isolated Preview and production Supabase projects and rebuild each only from
       migrations.

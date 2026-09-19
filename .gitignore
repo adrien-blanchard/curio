@@ -46,6 +46,7 @@ yarn-error.log*
 /test-results/
 /supabase/.temp/
 /migration-private/
+/extension_ref/
 /extension/dist/
 *.zip
 /.swc
