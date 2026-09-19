@@ -287,6 +287,8 @@ as $$
   where processing_attempt.workflow_run_id = p_workflow_run_id;
 $$;
 
+grant execute on function pg_temp.curio_workflow_thumbnail_path(text) to service_role;
+
 insert into public.entries (
   id,
   url,

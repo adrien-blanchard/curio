@@ -36,6 +36,8 @@ as $$
   where processing_attempt.workflow_run_id = p_workflow_run_id;
 $$;
 
+grant execute on function pg_temp.curio_workflow_thumbnail_path(text) to service_role;
+
 select is(
   (select created_at from public.allowed_email_domains where domain = 'example.test'),
   '2000-01-01 00:00:00+00'::timestamptz,

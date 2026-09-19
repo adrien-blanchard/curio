@@ -1,10 +1,14 @@
 # Curio v1.0 release checklist
 
-This is the single, short tracker for the work that remains before Curio v1.0 is made public. Check
-an item only when it has been exercised against the environment named by the item.
+This tracks source publication and deployment readiness separately. Publishing the repository does
+not promote the existing Preview to production. Check an item only when it has been exercised
+against the environment named by the item.
 
 ## Verified baseline
 
+- [x] Database permission hardening: 359 assertions pass locally, including regression tests for
+      Supabase's default function grants. Session mutations exclude the service role; worker grants
+      remain intact. The new migration has not been applied to the hosted development database.
 - [x] Pre-publication review (2026-09-19): patched dependencies; dependency audit reports zero known
       vulnerabilities. JSON API requests are capped at 64 KiB, and preparing an image replacement
       preserves other recent uploads. Both changes have regression tests. The final local suite has
