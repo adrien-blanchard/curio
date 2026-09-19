@@ -1,0 +1,45 @@
+begin;
+select plan(17);
+select ok(not has_function_privilege('anon', 'public.update_entry(uuid,uuid,text,text,public.entry_source_type,uuid[],boolean,date,text)', 'execute'), 'anonymous date edits denied');
+select ok(not has_function_privilege('authenticated', 'public.finalize_entry_processing(uuid,uuid,text,text,text,public.thumbnail_origin,uuid[],date,text)', 'execute'), 'members cannot forge analysis dates');
+select ok(has_function_privilege('service_role', 'public.finalize_entry_processing(uuid,uuid,text,text,text,public.thumbnail_origin,uuid[],date,text)', 'execute'), 'worker can finalize dates');
+select public.replace_allowed_email_access(array['example.test'], '{}');
+insert into auth.users(id,email) values ('71000000-0000-4000-8000-000000000001','dates@example.test'), ('71000000-0000-4000-8000-000000000002','other@example.test');
+insert into public.profiles(id,email,role) values ('71000000-0000-4000-8000-000000000001','dates@example.test','contributor'), ('71000000-0000-4000-8000-000000000002','other@example.test','contributor');
+insert into public.entries(id,url,canonical_url,status,created_by) values ('72000000-0000-4000-8000-000000000001','https://example.test/dates','https://example.test/dates','queued','71000000-0000-4000-8000-000000000001');
+select is((select source_published_at from public.entries where id='72000000-0000-4000-8000-000000000001'), null::date, 'creation does not invent source date');
+create function pg_temp.finish_source_test(p_date date, p_kind text) returns void language plpgsql as $$
+declare a uuid;
+begin
+  select id into a from public.begin_processing_attempt('72000000-0000-4000-8000-000000000001','source-date-run');
+  perform public.mark_entry_analyzing('72000000-0000-4000-8000-000000000001', a);
+  perform public.mark_entry_finalizing('72000000-0000-4000-8000-000000000001', a);
+  perform public.finalize_entry_processing('72000000-0000-4000-8000-000000000001', a, 'Source date test', 'An explicit publication date taken from the original source.', '72000000-0000-4000-8000-000000000001/workflow-' || a || '.webp', 'placeholder', '{}'::uuid[], p_date, p_kind);
+end;
+$$;
+select lives_ok($$select pg_temp.finish_source_test('2020-01-31','published')$$, 'worker commits source date with ready state');
+select is((select source_published_at from public.entries where id='72000000-0000-4000-8000-000000000001'), date '2020-01-31', 'extracted source date persisted');
+select is((select source_date_origin from public.entries where id='72000000-0000-4000-8000-000000000001'), 'ai', 'AI provenance recorded');
+select set_config('request.jwt.claim.sub','71000000-0000-4000-8000-000000000001',true);
+select set_config('request.jwt.claims','{"sub":"71000000-0000-4000-8000-000000000001","email":"dates@example.test"}',true);
+set local role authenticated;
+select lives_ok($$select public.update_entry('71000000-0000-4000-8000-000000000001','72000000-0000-4000-8000-000000000001',null,null,null,null,true,'2020-02-29','released')$$, 'owner can correct date');
+select is((select source_date_origin from public.entries where id='72000000-0000-4000-8000-000000000001'), 'manual', 'manual provenance persisted and readable through RLS');
+select throws_ok($$select public.update_entry('71000000-0000-4000-8000-000000000001','72000000-0000-4000-8000-000000000001',null,null,null,null,true,'2999-01-01','published')$$, '22023', 'INVALID_SOURCE_DATE', 'future dates rejected');
+select throws_ok($$select public.update_entry('71000000-0000-4000-8000-000000000001','72000000-0000-4000-8000-000000000001',null,null,null,null,true,null,'published')$$, '22023', 'INVALID_SOURCE_DATE', 'mismatched date kind rejected');
+select lives_ok($$select public.update_entry('71000000-0000-4000-8000-000000000001','72000000-0000-4000-8000-000000000001',null,null,null,null,true,null,null)$$, 'owner can explicitly clear date');
+select is((select source_published_at from public.entries where id='72000000-0000-4000-8000-000000000001'), null::date, 'clear keeps unknown');
+reset role;
+-- Start a genuinely new processing cycle: finalization must preserve even a manual clear.
+update public.entries set status='queued', published_at=null where id='72000000-0000-4000-8000-000000000001';
+update public.processing_attempts set workflow_run_id='source-date-run-old' where workflow_run_id='source-date-run';
+select lives_ok($$select pg_temp.finish_source_test('2021-01-01','published')$$, 'new analysis preserves manual correction');
+select is((select source_published_at from public.entries where id='72000000-0000-4000-8000-000000000001'), null::date, 'AI cannot overwrite manually cleared date');
+select set_config('request.jwt.claim.sub','71000000-0000-4000-8000-000000000002',true);
+select set_config('request.jwt.claims','{"sub":"71000000-0000-4000-8000-000000000002","email":"other@example.test"}',true);
+set local role authenticated;
+select throws_ok($$select public.update_entry('71000000-0000-4000-8000-000000000002','72000000-0000-4000-8000-000000000001',null,null,null,null,true,'2020-01-01','published')$$, '42501', 'ENTRY_FORBIDDEN', 'other contributor cannot edit date');
+select throws_ok($$update public.entries set source_published_at='2020-01-01' where id='72000000-0000-4000-8000-000000000001'$$, '42501', null, 'direct updates cannot bypass RPC');
+reset role;
+select * from finish();
+rollback;

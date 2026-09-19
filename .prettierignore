@@ -1,0 +1,12 @@
+.next/
+src/app/.well-known/workflow/
+build/
+coverage/
+node_modules/
+out/
+playwright-report/
+test-results/
+public/extension/*.zip
+src/lib/migration/.local/
+*.tsbuildinfo
+package-lock.json

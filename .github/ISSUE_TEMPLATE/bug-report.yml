@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible problem in Curio.
+title: "[Bug]: "
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include credentials, private URLs, personal data, provider payloads, or vulnerability details.
+        Use the private process in SECURITY.md for security reports.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide sanitized steps and the smallest safe example.
+      placeholder: |
+        1. Configure ...
+        2. Open ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Curio version or commit
+      placeholder: v1.0.0 or a short commit ID
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - Web dashboard
+        - API
+        - Ingestion workflow
+        - Supabase migration or RLS
+        - Chrome extension
+        - Documentation or tooling
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Sanitized environment
+      description:
+        Browser, Node version, operating system, and local or hosted deployment. Never paste
+        environment values.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Redact IDs, emails, URLs, tokens, cookies, prompts, and content before attaching.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I removed secrets, personal data, and private content.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

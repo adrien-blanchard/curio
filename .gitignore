@@ -1,0 +1,64 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment files. The documented template is intentionally committed.
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# local test and release artifacts
+/artifacts/
+/playwright-report/
+/test-results/
+/supabase/.temp/
+/migration-private/
+/extension/dist/
+*.zip
+/.swc
+
+# Keep local media iterations; publish only the selected final exports.
+/docs/media/v001/
+/docs/media/v002/*
+!/docs/media/v002/curio_0[1-5].jpg
+!/docs/media/v002/Curio Full.mp4
+!/docs/media/v002/Curio Preview.mp4
+!/docs/media/v002/README.md
+!/docs/media/v002/MUSIC-CREDIT.md
+
+# Personal import helpers and source-editing masters never belong in the repository.
+/src/lib/migration/.local/
+*.mov

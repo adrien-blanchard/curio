@@ -1,0 +1,11 @@
+title = "Curio secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Public Chrome signing identity, not a private key or API credential"
+condition = "AND"
+paths = ['''(^|/)extension/manifest\.json$''']
+regexTarget = "line"
+regexes = ['''"key":\s*"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr16qsbddVkEPi1IKsKY4UYveh/''']

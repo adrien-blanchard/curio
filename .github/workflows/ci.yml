@@ -1,0 +1,145 @@
+name: CI
+
+on:
+  workflow_call:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  NEXT_PUBLIC_APP_NAME: Curio
+  NEXT_PUBLIC_ORGANIZATION_NAME: Example
+  NEXT_PUBLIC_APP_URL: https://curio.example.invalid
+  NEXT_PUBLIC_DEMO_ENABLED: "true"
+  NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-role-key
+  API_TOKEN_PEPPER: ci-placeholder-pepper-at-least-thirty-two-characters
+  ALLOWED_EMAIL_DOMAINS: example.invalid
+  DEFAULT_USER_ROLE: contributor
+  INITIAL_ADMIN_EMAILS: admin@example.invalid
+  GEMINI_MODEL: gemini-3.1-flash-lite
+  GEMINI_API_KEY: ci-placeholder-gemini-key
+  EXTENSION_ENABLED: "false"
+  ALLOWED_EXTENSION_IDS: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  NEXT_PUBLIC_EXTENSION_INSTALL_URL: ""
+  PRIVACY_CONTACT_EMAIL: privacy@example.invalid
+
+jobs:
+  detect-database:
+    name: Detect local database contract
+    runs-on: ubuntu-latest
+    outputs:
+      available: ${{ steps.detect.outputs.available }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - id: detect
+        name: Detect Supabase configuration
+        shell: bash
+        run: |
+          if [[ -f supabase/config.toml ]]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  quality:
+    name: Format, lint, types, and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:coverage
+
+  build:
+    name: Production build
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  browser:
+    name: Playwright
+    needs: [quality, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Upload Playwright diagnostics
+        if: failure() && hashFiles('playwright-report/**') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  extension:
+    name: Extension safety and package
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run test:extension
+      - run: npm run extension:build -- --check
+
+  database:
+    name: Local Supabase and RLS
+    needs: [quality, detect-database]
+    if: needs.detect-database.outputs.available == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
+        with:
+          version: 2.101.0
+      - name: Start isolated Supabase services
+        run: supabase start
+      - name: Run pgTAP database and RLS tests
+        run: npm run test:rls
+      - name: Stop local Supabase services
+        if: always()
+        run: supabase stop --no-backup

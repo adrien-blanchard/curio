@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Curio extension settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="settings-shell">
+      <header class="settings-header">
+        <img src="icons/icon-128.png" alt="" width="56" height="56" />
+        <div>
+          <p class="eyebrow">Browser extension</p>
+          <h1>Connect to Curio</h1>
+          <p>Paste the connection key created in Curio under My Account.</p>
+        </div>
+      </header>
+
+      <section class="card" aria-labelledby="connection-title">
+        <h2 id="connection-title">Connection</h2>
+        <form id="settings-form" novalidate>
+          <div class="field">
+            <label for="instance-url">Instance URL</label>
+            <input
+              id="instance-url"
+              name="instanceUrl"
+              type="url"
+              inputmode="url"
+              autocomplete="url"
+              spellcheck="false"
+              placeholder="https://…"
+              required
+            />
+            <p class="hint">
+              HTTPS is required except for localhost development. Only this origin is requested from
+              Chrome.
+            </p>
+          </div>
+
+          <div class="field">
+            <label for="personal-token">Connection key</label>
+            <input
+              id="personal-token"
+              name="token"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Leave blank to keep the saved key"
+            />
+            <p id="token-state" class="hint">No connection key is stored.</p>
+          </div>
+
+          <div class="scope-box">
+            <h3>What this connection can do</h3>
+            <ul>
+              <li>Save public page links to Curio</li>
+              <li>Read the available tags</li>
+              <li>Confirm which Curio account is connected</li>
+            </ul>
+            <p>It cannot manage members, roles, or Curio settings.</p>
+          </div>
+
+          <div id="settings-status" class="status" role="status" aria-live="polite" hidden></div>
+
+          <div class="button-row">
+            <button id="save-settings" class="button button-primary" type="submit">
+              Verify and save
+            </button>
+            <button id="forget-token" class="button button-secondary" type="button">
+              Forget key on this device
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card warning" aria-labelledby="storage-risk-title">
+        <h2 id="storage-risk-title">Connection key and revocation</h2>
+        <p>
+          The connection key is stored in <code>chrome.storage.local</code>. Chrome does not provide
+          application-level encryption for this value, so anyone or any software with access to this
+          browser profile may be able to recover it. Never reuse another credential, and revoke the
+          connection from your Curio account if this device is lost or compromised.
+        </p>
+        <p>
+          Forgetting the key here removes only this browser copy; server-side revocation remains
+          authoritative.
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="options.mjs"></script>
+  </body>
+</html>
