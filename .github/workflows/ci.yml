@@ -135,11 +135,14 @@ jobs:
       - run: npm ci
       - uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
         with:
-          version: 2.101.0
+          version: 2.114.0
       - name: Start isolated Supabase services
         run: supabase start
       - name: Run pgTAP database and RLS tests
         run: npm run test:rls
+      - name: Database diagnostics
+        if: failure()
+        run: docker logs --tail 150 supabase_db_curio
       - name: Stop local Supabase services
         if: always()
         run: supabase stop --no-backup
