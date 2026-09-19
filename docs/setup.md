@@ -9,7 +9,7 @@ variable contract.
 - Node.js 24, as declared by `.nvmrc` and `package.json`;
 - npm 11.6.2, as declared by `packageManager`;
 - Docker;
-- Supabase CLI 2.101.0, matching CI;
+- Supabase CLI 2.114.0, matching CI;
 - a Gemini API key for the configured model;
 - a Google OAuth web client for authenticated sign-in.
 
