@@ -53,7 +53,7 @@
     "sharp": "0.35.4",
     "tailwind-merge": "3.6.0",
     "workflow": "4.8.9",
-    "zod": "4.4.3"
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@cyclonedx/cyclonedx-npm": "6.0.1",
