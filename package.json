@@ -43,14 +43,14 @@
   },
   "dependencies": {
     "@google/genai": "2.17.1",
-    "@supabase/ssr": "0.12.4",
+    "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.112.3",
     "clsx": "2.1.1",
     "lucide-react": "1.31.0",
-    "next": "16.3.5",
+    "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "tailwind-merge": "3.6.0",
     "workflow": "4.8.9",
     "zod": "4.4.3"
