@@ -47,3 +47,10 @@ deleting the file or rewriting history is not sufficient.
 
 Release CI runs dependency audit, CodeQL, secret scanning, deterministic extension packaging, and
 SBOM generation. Verify release checksums and review the included CycloneDX SBOM before deployment.
+
+The Next.js ESLint plugin's `fast-glob` dependency uses a scoped adapter in `tools/eslint-glob`,
+backed by `tinyglobby@0.2.17`, to remove the unpatched `braces` advisory GHSA-vfj7-8cjw-p6xm. The
+adapter supports the plugin's `globSync` / `onlyDirectories` call and preserves absolute paths;
+regression tests cover root-directory discovery. It rejects unexpected API usage. Reassess this
+override when upgrading the plugin. Dependency auditing remains enabled for both runtime and
+development packages, without advisory exceptions.
