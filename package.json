@@ -43,14 +43,14 @@
   },
   "dependencies": {
     "@google/genai": "2.17.1",
-    "@supabase/ssr": "0.12.4",
-    "@supabase/supabase-js": "2.112.3",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.2",
     "clsx": "2.1.1",
     "lucide-react": "1.31.0",
-    "next": "16.3.5",
+    "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "tailwind-merge": "3.6.0",
     "workflow": "4.8.9",
     "zod": "4.4.3"
@@ -69,7 +69,8 @@
     "ajv-formats": "3.0.1",
     "ajv-formats-draft2019": "1.6.1",
     "eslint": "9.39.2",
-    "eslint-config-next": "16.3.5",
+    "eslint-config-next": "16.3.8",
+    "fast-glob": "file:tools/eslint-glob",
     "jsdom": "28.0.0",
     "prettier": "3.9.6",
     "supabase": "2.114.0",
@@ -78,13 +79,18 @@
     "vitest": "4.1.11"
   },
   "overrides": {
+    "@next/eslint-plugin-next": {
+      "fast-glob": "$fast-glob"
+    },
     "@babel/core": "7.29.7",
     "@emnapi/core": "1.11.3",
-    "brace-expansion@<1.1.18": "1.1.18",
-    "brace-expansion@>=3.0.0 <5.0.9": "5.0.9",
+    "brace-expansion@<1.1.21": "1.1.21",
+    "brace-expansion@>=2.0.0 <3.0.0": "2.1.7",
+    "brace-expansion@>=3.0.0 <5.0.12": "5.0.12",
+    "devalue": "5.9.4",
     "js-yaml": "4.3.2",
     "nanoid": "5.1.16",
-    "undici": "7.29.0",
+    "undici": "7.29.1",
     "ws": "8.21.3"
   }
 }

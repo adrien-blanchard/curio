@@ -11,6 +11,12 @@ updates:
     open-pull-requests-limit: 10
     versioning-strategy: increase-if-necessary
     groups:
+      supabase-client:
+        patterns: ["@supabase/ssr", "@supabase/supabase-js"]
+        update-types: [minor, patch]
+      next-framework:
+        patterns: ["next", "eslint-config-next"]
+        update-types: [minor, patch]
       development-tooling:
         dependency-type: development
         update-types: [minor, patch]
