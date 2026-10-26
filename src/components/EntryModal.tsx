@@ -147,6 +147,11 @@ export default function EntryModal({
     entry.thumbnailOrigin ?? null,
   );
   const [failedThumbnailUrl, setFailedThumbnailUrl] = useState<string | null>(null);
+  const [thumbnailSource, setThumbnailSource] = useState({
+    id: entry.id,
+    url: entry.thumbnailUrl,
+    origin: entry.thumbnailOrigin ?? null,
+  });
   const [activeOperation, setActiveOperation] = useState<ActiveOperation | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
@@ -212,11 +217,21 @@ export default function EntryModal({
     };
   }, [previewUrl]);
 
-  useEffect(() => {
+  // Reconcile changed source props before rendering children, not in a post-render effect.
+  if (
+    thumbnailSource.id !== entry.id ||
+    thumbnailSource.url !== entry.thumbnailUrl ||
+    thumbnailSource.origin !== (entry.thumbnailOrigin ?? null)
+  ) {
+    setThumbnailSource({
+      id: entry.id,
+      url: entry.thumbnailUrl,
+      origin: entry.thumbnailOrigin ?? null,
+    });
     setCurrentThumbnailUrl(entry.thumbnailUrl);
     setCurrentThumbnailOrigin(entry.thumbnailOrigin ?? null);
     setFailedThumbnailUrl(null);
-  }, [entry.id, entry.thumbnailOrigin, entry.thumbnailUrl]);
+  }
 
   useEffect(() => {
     if (!retrySucceeded) {

@@ -69,6 +69,34 @@ function jsonResponse(data: unknown, status = 200) {
 }
 
 describe("EntryModal detail and management modes", () => {
+  it("replaces a failed preview when refreshed thumbnail props arrive", () => {
+    const onClose = vi.fn();
+    const { rerender } = render(
+      <EntryModal
+        entry={{ ...entry, thumbnailUrl: "https://example.com/old.jpg" }}
+        role="reader"
+        onClose={onClose}
+      />,
+    );
+    fireEvent.error(screen.getByRole("dialog").querySelector("img")!);
+    expect(screen.getByRole("dialog").querySelector("img")).toHaveAttribute(
+      "src",
+      getEntryPlaceholderImage(entry.id),
+    );
+    rerender(
+      <EntryModal
+        entry={{ ...entry, thumbnailUrl: "https://example.com/new.jpg", thumbnailOrigin: "manual" }}
+        role="reader"
+        onClose={onClose}
+      />,
+    );
+    expect(screen.getByRole("dialog").querySelector("img")).toHaveAttribute(
+      "src",
+      "https://example.com/new.jpg",
+    );
+    expect(screen.queryByText("No preview")).not.toBeInTheDocument();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.uploadToSignedUrl.mockResolvedValue({ data: { path: uploadPath }, error: null });

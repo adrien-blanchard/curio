@@ -54,32 +54,36 @@ export default function AdminTokenInventory({ embedded = false }: { embedded?: b
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(
-    async (signal?: AbortSignal) => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`/api/v1/tokens?view=organization&page=${page}`, {
-          headers: { Accept: "application/json" },
-          cache: "no-store",
-          signal,
-        });
-        const parsed = listSchema.safeParse(await response.json());
-        if (!response.ok || !parsed.success)
-          throw new Error("Organization tokens could not be loaded.");
-        setTokens(parsed.data.data.tokens);
-        setTotal(parsed.data.data.total);
-        setPageSize(parsed.data.data.pageSize);
-      } catch (loadError: unknown) {
-        if (loadError instanceof DOMException && loadError.name === "AbortError") return;
-        setError(
-          loadError instanceof Error
-            ? loadError.message
-            : "Organization tokens could not be loaded.",
-        );
-      } finally {
-        if (!signal?.aborted) setIsLoading(false);
-      }
-    },
+    (signal?: AbortSignal) =>
+      fetch(`/api/v1/tokens?view=organization&page=${page}`, {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+        signal,
+      })
+        .then(async (response) => {
+          const parsed = listSchema.safeParse(await response.json());
+          if (signal?.aborted) return;
+          if (!response.ok || !parsed.success)
+            throw new Error("Organization tokens could not be loaded.");
+          setTokens(parsed.data.data.tokens);
+          setTotal(parsed.data.data.total);
+          setPageSize(parsed.data.data.pageSize);
+        })
+        .catch((loadError: unknown) => {
+          if (
+            signal?.aborted ||
+            (loadError instanceof DOMException && loadError.name === "AbortError")
+          )
+            return;
+          setError(
+            loadError instanceof Error
+              ? loadError.message
+              : "Organization tokens could not be loaded.",
+          );
+        })
+        .finally(() => {
+          if (!signal?.aborted) setIsLoading(false);
+        }),
     [page],
   );
 
@@ -99,6 +103,7 @@ export default function AdminTokenInventory({ embedded = false }: { embedded?: b
       });
       if (!response.ok) throw new Error("The organization token could not be revoked.");
       setConfirmingId(null);
+      setIsLoading(true);
       await load();
     } catch (revokeError: unknown) {
       setError(
@@ -112,6 +117,11 @@ export default function AdminTokenInventory({ embedded = false }: { embedded?: b
   };
 
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const changePage = (nextPage: number) => {
+    setIsLoading(true);
+    setError(null);
+    setPage(nextPage);
+  };
 
   return (
     <section
@@ -242,7 +252,7 @@ export default function AdminTokenInventory({ embedded = false }: { embedded?: b
       >
         <button
           type="button"
-          onClick={() => setPage((current) => Math.max(1, current - 1))}
+          onClick={() => changePage(Math.max(1, page - 1))}
           disabled={page <= 1 || isLoading}
           className="rounded-lg bg-[#E9EDF7] px-3 py-2 text-xs font-bold text-[#1B254B] disabled:opacity-50"
         >
@@ -253,7 +263,7 @@ export default function AdminTokenInventory({ embedded = false }: { embedded?: b
         </span>
         <button
           type="button"
-          onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+          onClick={() => changePage(Math.min(pageCount, page + 1))}
           disabled={page >= pageCount || isLoading}
           className="rounded-lg bg-[#E9EDF7] px-3 py-2 text-xs font-bold text-[#1B254B] disabled:opacity-50"
         >

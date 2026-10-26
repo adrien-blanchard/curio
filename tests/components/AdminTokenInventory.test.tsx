@@ -7,7 +7,7 @@ import AdminTokenInventory from "@/app/dashboard/admin/AdminTokenInventory";
 
 const tokenId = "00000000-0000-4000-8000-000000000301";
 
-function listResponse(revokedAt: string | null = null) {
+function listResponse(revokedAt: string | null = null, page = 1, total = 1) {
   return new Response(
     JSON.stringify({
       data: {
@@ -24,8 +24,8 @@ function listResponse(revokedAt: string | null = null) {
             owner_email: "member@example.test",
           },
         ],
-        total: 1,
-        page: 1,
+        total,
+        page,
         pageSize: 50,
       },
       error: null,
@@ -36,6 +36,34 @@ function listResponse(revokedAt: string | null = null) {
 
 describe("administrator token inventory", () => {
   afterEach(() => vi.unstubAllGlobals());
+
+  it("shows loading immediately while fetching another page", async () => {
+    let finish!: (response: Response) => void;
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(listResponse(null, 1, 100))
+      .mockImplementationOnce(
+        () =>
+          new Promise<Response>((resolve) => {
+            finish = resolve;
+          }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AdminTokenInventory />);
+    expect(screen.getByRole("status")).toHaveTextContent("Loading tokens");
+    await screen.findByRole("button", { name: "Revoke" });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("status")).toHaveTextContent("Loading tokens");
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      "/api/v1/tokens?view=organization&page=2",
+      expect.any(Object),
+    );
+    finish(listResponse(null, 2, 100));
+    await screen.findByRole("button", { name: "Revoke" });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Previous" })).toBeEnabled();
+  });
 
   it("requires explicit confirmation before revoking another member's token", async () => {
     const fetchMock = vi
