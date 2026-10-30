@@ -43,7 +43,7 @@ describe("dashboard sidebar", () => {
 
   it("shows the configured Chrome Web Store link", () => {
     const extensionUrl =
-      "https://chromewebstore.google.com/detail/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+      "https://chromewebstore.google.com/detail/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     render(
       <Sidebar
         role="contributor"

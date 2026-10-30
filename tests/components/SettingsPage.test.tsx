@@ -21,7 +21,7 @@ vi.mock("@/app/dashboard/settings/PersonalAccessTokens", () => ({
 
 import SettingsPage from "@/app/dashboard/settings/page";
 
-const installUrl = "https://chromewebstore.google.com/detail/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+const installUrl = "https://chromewebstore.google.com/detail/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 describe("account extension access", () => {
   beforeEach(() => {

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import PersonalAccessTokens from "@/app/dashboard/settings/PersonalAccessTokens";
 
-const installUrl = "https://chromewebstore.google.com/detail/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+const installUrl = "https://chromewebstore.google.com/detail/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 function jsonResponse(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {
